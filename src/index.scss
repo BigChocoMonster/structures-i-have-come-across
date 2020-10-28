@@ -24,6 +24,17 @@ button {
   border-radius: 4px;
   font-family: inherit;
   border: 1px solid rgba($color: #000000, $alpha: 0.16);
+
+  &:disabled {
+    color: #a4a4a4;
+    cursor: not-allowed;
+    background-color: #e3e3e3;
+
+    &::placeholder {
+      opacity: 1;
+      color: inherit;
+    }
+  }
 }
 
 input {

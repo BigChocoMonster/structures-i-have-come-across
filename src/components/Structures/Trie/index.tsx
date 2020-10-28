@@ -8,6 +8,7 @@ type State = {
   searchTree: TrieNode;
   searchInput: string;
   insertionInput: string;
+  isSearchDisabled: boolean;
 };
 export default class Trie extends Component<{}, State> {
   constructor(props: {}) {
@@ -15,9 +16,19 @@ export default class Trie extends Component<{}, State> {
     this.state = {
       tree: new TrieNode(),
       searchTree: new TrieNode(),
-      insertionInput: "A brown fox has graced our home",
-      searchInput: "brown",
+      insertionInput: "",
+      searchInput: "",
+      isSearchDisabled: true,
     };
+  }
+
+  componentDidUpdate(_: {}, prevState: State) {
+    if (!prevState.isSearchDisabled && this.state.isSearchDisabled) {
+      this.setState({
+        searchInput: "",
+        searchTree: new TrieNode(),
+      });
+    }
   }
 
   startInsertion() {
@@ -46,6 +57,7 @@ export default class Trie extends Component<{}, State> {
 
         this.setState({
           tree: this.state.tree,
+          isSearchDisabled: false,
         });
       }
     );
@@ -114,9 +126,13 @@ export default class Trie extends Component<{}, State> {
           <div className="input">
             Input:
             <input
+              placeholder="Try entering a sentence (eg: A brown fox has graced our home)"
               value={this.state.insertionInput}
               onChange={(event) => {
-                this.setState({ insertionInput: event.target.value });
+                this.setState({
+                  insertionInput: event.target.value,
+                  isSearchDisabled: true,
+                });
               }}
               onKeyPress={(event) => {
                 event.key === "Enter" &&
@@ -127,6 +143,7 @@ export default class Trie extends Component<{}, State> {
           </div>
           <div className="subtitle">Insertion</div>
           <button
+            disabled={!this.state.insertionInput}
             onClick={() => {
               this.state.insertionInput.trim() && this.startInsertion();
             }}
@@ -138,6 +155,8 @@ export default class Trie extends Component<{}, State> {
           <div className="input">
             Input:
             <input
+              placeholder="Try searching for a word in the sentence (eg: brown or tofu)"
+              disabled={this.state.isSearchDisabled}
               value={this.state.searchInput}
               onChange={(event) => {
                 this.setState({ searchInput: event.target.value });
@@ -151,6 +170,7 @@ export default class Trie extends Component<{}, State> {
             />
           </div>
           <button
+            disabled={this.state.isSearchDisabled}
             onClick={() => {
               this.state.tree.children.size &&
                 this.state.searchInput.trim() &&
