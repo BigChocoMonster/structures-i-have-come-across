@@ -9,6 +9,7 @@ type State = {
   searchInput: string;
   insertionInput: string;
   isSearchDisabled: boolean;
+  searchedWords: { text: string; hasMatched: boolean }[];
 };
 export default class Trie extends Component<{}, State> {
   constructor(props: {}) {
@@ -19,6 +20,7 @@ export default class Trie extends Component<{}, State> {
       insertionInput: "",
       searchInput: "",
       isSearchDisabled: true,
+      searchedWords: [],
     };
   }
 
@@ -26,6 +28,8 @@ export default class Trie extends Component<{}, State> {
     if (!prevState.isSearchDisabled && this.state.isSearchDisabled) {
       this.setState({
         searchInput: "",
+        searchedWords: [],
+        tree: new TrieNode(),
         searchTree: new TrieNode(),
       });
     }
@@ -103,14 +107,24 @@ export default class Trie extends Component<{}, State> {
           break;
         }
       }
+
+      this.setState((prevState) => ({
+        searchedWords: prevState.searchedWords.concat({
+          text: word,
+          hasMatched: current.isEndOfWord,
+        }),
+      }));
     };
 
     this.setState(
       {
+        searchedWords: [],
         searchTree: deepcopy(this.state.tree),
       },
       () => {
-        searchWord(this.state.searchInput);
+        for (let word of this.state.searchInput.split(" ")) {
+          searchWord(word);
+        }
 
         this.setState({
           searchTree: this.state.searchTree,
@@ -155,7 +169,7 @@ export default class Trie extends Component<{}, State> {
           <div className="input">
             Input:
             <input
-              placeholder="Try searching for a word in the sentence (eg: brown or tofu)"
+              placeholder="Try searching for word(s) in the sentence (eg: brown or happy tofu)"
               disabled={this.state.isSearchDisabled}
               value={this.state.searchInput}
               onChange={(event) => {
@@ -166,7 +180,6 @@ export default class Trie extends Component<{}, State> {
                   this.state.searchInput.trim() &&
                   this.startSearch();
               }}
-              autoFocus={true}
             />
           </div>
           <button
@@ -179,6 +192,16 @@ export default class Trie extends Component<{}, State> {
           >
             Start search
           </button>
+          <div id="pill-container">
+            {this.state.searchedWords.map((word, index) => (
+              <div
+                key={index}
+                className={`pill ${word.hasMatched ? "has" : "has-not"}`}
+              >
+                {word.text}
+              </div>
+            ))}
+          </div>
           <div className="playground">
             {this.renderTree(this.state.searchTree, "search")}
           </div>

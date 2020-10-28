@@ -1,4 +1,34 @@
 #__trie__ {
+  #pill-container {
+    .pill {
+      margin: 10px;
+      margin-left: 0;
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      align-items: center;
+      display: inline-flex;
+      border: 1px solid rgba($color: #000000, $alpha: 0.16);
+
+      &::after {
+        width: 5px;
+        height: 5px;
+        content: " ";
+        display: block;
+        margin-left: 10px;
+        border-radius: 50%;
+      }
+
+      &.has::after {
+        background-color: #71de56;
+      }
+
+      &.has-not::after {
+        background-color: #ae1919;
+      }
+    }
+  }
+
   .playground {
     display: flex;
     text-align: center;
