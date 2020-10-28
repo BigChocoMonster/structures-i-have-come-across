@@ -1,0 +1,16 @@
+#__bar__ {
+  width: 20%;
+  min-width: 250px;
+  background-color: #004d4d;
+
+  .structure-item {
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 17px 30px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
