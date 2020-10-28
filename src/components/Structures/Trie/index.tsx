@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { deepcopy } from "../../../utils/functions";
+import Radio from "../../../utils/Radio";
 import Common from "../Common";
 import "./styles.scss";
 
@@ -9,6 +10,7 @@ type State = {
   searchInput: string;
   insertionInput: string;
   isSearchDisabled: boolean;
+  searchBy: "word" | "prefix";
   searchedWords: { text: string; hasMatched: boolean }[];
 };
 export default class Trie extends Component<{}, State> {
@@ -21,11 +23,15 @@ export default class Trie extends Component<{}, State> {
       searchInput: "",
       isSearchDisabled: true,
       searchedWords: [],
+      searchBy: "word",
     };
   }
 
   componentDidUpdate(_: {}, prevState: State) {
-    if (!prevState.isSearchDisabled && this.state.isSearchDisabled) {
+    if (
+      (!prevState.isSearchDisabled && this.state.isSearchDisabled) ||
+      prevState.searchBy !== this.state.searchBy
+    ) {
       this.setState({
         searchInput: "",
         searchedWords: [],
@@ -97,6 +103,7 @@ export default class Trie extends Component<{}, State> {
   startSearch() {
     const searchWord = (word: string) => {
       let current = this.state.searchTree;
+      let hasMatched: boolean = true;
 
       for (let character of word) {
         const childNode = current.children.get(character);
@@ -104,6 +111,7 @@ export default class Trie extends Component<{}, State> {
           current = childNode;
           current.hasMatched = true;
         } else {
+          hasMatched = false;
           break;
         }
       }
@@ -111,7 +119,8 @@ export default class Trie extends Component<{}, State> {
       this.setState((prevState) => ({
         searchedWords: prevState.searchedWords.concat({
           text: word,
-          hasMatched: current.isEndOfWord,
+          hasMatched:
+            this.state.searchBy === "word" ? current.isEndOfWord : hasMatched,
         }),
       }));
     };
@@ -166,6 +175,16 @@ export default class Trie extends Component<{}, State> {
           </button>
           <div className="playground">{this.renderTree(this.state.tree)}</div>
           <div className="subtitle">Search</div>
+          <Radio
+            disabled={this.state.isSearchDisabled}
+            leftText="By word"
+            rightText="By prefix"
+            onChange={(position: "left" | "right") => {
+              this.setState({
+                searchBy: position === "right" ? "prefix" : "word",
+              });
+            }}
+          />
           <div className="input">
             Input:
             <input
@@ -199,6 +218,7 @@ export default class Trie extends Component<{}, State> {
                 className={`pill ${word.hasMatched ? "has" : "has-not"}`}
               >
                 {word.text}
+                {this.state.searchBy === "prefix" ? "-" : ""}
               </div>
             ))}
           </div>
