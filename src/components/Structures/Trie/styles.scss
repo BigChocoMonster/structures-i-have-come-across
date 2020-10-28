@@ -1,0 +1,19 @@
+#__trie__ {
+  .playground {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+
+    .playground {
+      padding: 0;
+      border: none;
+      margin-top: 0;
+      min-height: auto;
+    }
+
+    .node:not(:last-child),
+    .node:not(:first-child) {
+      margin: 0 10px;
+    }
+  }
+}

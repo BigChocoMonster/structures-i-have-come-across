@@ -13,3 +13,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+input,
+button {
+  margin: 10px 0;
+  font-size: 14px;
+  box-shadow: none;
+  font-weight: 300;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-family: inherit;
+  border: 1px solid rgba($color: #000000, $alpha: 0.16);
+}
+
+input {
+  display: block;
+}
+
+button {
+  cursor: pointer;
+}

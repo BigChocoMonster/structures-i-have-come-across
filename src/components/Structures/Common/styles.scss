@@ -1,0 +1,40 @@
+#structure-container {
+  padding: 20px;
+
+  #title {
+    top: 0;
+    font-size: 22px;
+    font-weight: 600;
+    position: sticky;
+    padding-top: 20px;
+    margin-top: -20px;
+    margin-bottom: 30px;
+    background-color: #fff;
+    border-bottom: 1px solid black;
+  }
+
+  .subtitle {
+    margin-top: 30px;
+    font-size: 18px;
+  }
+
+  .input {
+    display: grid;
+    font-size: 16px;
+    font-weight: 300;
+    align-items: center;
+    grid-column-gap: 15px;
+    grid-template-columns: 42px auto;
+  }
+
+  .playground {
+    padding: 20px;
+    min-height: 100px;
+    border-radius: 4px;
+    border: 1px solid black;
+  }
+
+  .playground {
+    margin-top: 10px;
+  }
+}
