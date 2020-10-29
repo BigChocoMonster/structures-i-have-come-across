@@ -89,33 +89,6 @@ export default class Trie extends Component<{}, State> {
     );
   }
 
-  renderTree(node: TrieNode, parameter?: "search" | "delete"): JSX.Element {
-    if (node.isEndOfWord) {
-      return <>.</>;
-    } else {
-      return (
-        <>
-          {Array.from(node.children).map(([key, value], index) => (
-            <div key={index} className="node">
-              <div
-                style={{
-                  color:
-                    value.hasMatched && parameter === "search" ? "blue" : "",
-                }}
-              >
-                {key}
-              </div>
-              <div>🠓</div>
-              <div className="playground">
-                {this.renderTree(value, parameter)}
-              </div>
-            </div>
-          ))}
-        </>
-      );
-    }
-  }
-
   startSearch() {
     const searchWord = (word: string) => {
       let current = this.state.searchTree;
@@ -197,13 +170,42 @@ export default class Trie extends Component<{}, State> {
         deletionTree: deepcopy(this.state.tree),
       },
       () => {
-        deleteWord(this.state.deletionInput);
+        for (let word of this.state.deletionInput.split(" ")) {
+          deleteWord(word);
+        }
 
         this.setState({
           deletionTree: this.state.deletionTree,
         });
       }
     );
+  }
+
+  renderTree(node: TrieNode, parameter?: "search" | "delete"): JSX.Element {
+    if (node.isEndOfWord) {
+      return <>.</>;
+    } else {
+      return (
+        <>
+          {Array.from(node.children).map(([key, value], index) => (
+            <div key={index} className="node">
+              <div
+                style={{
+                  color:
+                    value.hasMatched && parameter === "search" ? "blue" : "",
+                }}
+              >
+                {key}
+              </div>
+              <div>🠓</div>
+              <div className="playground">
+                {this.renderTree(value, parameter)}
+              </div>
+            </div>
+          ))}
+        </>
+      );
+    }
   }
 
   render() {
