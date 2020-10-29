@@ -12,7 +12,15 @@ type State = {
   isSearchDisabled: boolean;
   searchBy: "word" | "prefix";
   searchedWords: { text: string; hasMatched: boolean }[];
+  deletionInput: string;
+  deletionTree: TrieNode;
 };
+
+const wordPlaceholder =
+  "Try searching for word(s) in the sentence (eg: brown or happy tofu)";
+const prefixPlaceholder =
+  "Try searching for prefix(es) for words in the sentence (eg: br or h tof)";
+
 export default class Trie extends Component<{}, State> {
   constructor(props: {}) {
     super(props);
@@ -24,18 +32,26 @@ export default class Trie extends Component<{}, State> {
       isSearchDisabled: true,
       searchedWords: [],
       searchBy: "word",
+      deletionInput: "",
+      deletionTree: new TrieNode(),
     };
   }
 
   componentDidUpdate(_: {}, prevState: State) {
-    if (
-      (!prevState.isSearchDisabled && this.state.isSearchDisabled) ||
-      prevState.searchBy !== this.state.searchBy
-    ) {
+    if (!prevState.isSearchDisabled && this.state.isSearchDisabled) {
       this.setState({
         searchInput: "",
         searchedWords: [],
-        tree: new TrieNode(),
+        searchTree: new TrieNode(),
+        deletionInput: "",
+        deletionTree: new TrieNode(),
+      });
+    }
+
+    if (prevState.searchBy !== this.state.searchBy) {
+      this.setState({
+        searchInput: "",
+        searchedWords: [],
         searchTree: new TrieNode(),
       });
     }
@@ -73,7 +89,7 @@ export default class Trie extends Component<{}, State> {
     );
   }
 
-  renderTree(node: TrieNode, parameter?: "search"): JSX.Element {
+  renderTree(node: TrieNode, parameter?: "search" | "delete"): JSX.Element {
     if (node.isEndOfWord) {
       return <>.</>;
     } else {
@@ -142,6 +158,54 @@ export default class Trie extends Component<{}, State> {
     );
   }
 
+  startDeletion() {
+    const deleteWord = (word: string) => {
+      let current = this.state.deletionTree;
+      let matchedNodeList: TrieNode[] = [];
+
+      for (let character of word) {
+        const childNode = current.children.get(character);
+        if (childNode) {
+          current = childNode;
+          matchedNodeList.push(current);
+        } else {
+          break;
+        }
+      }
+
+      if (current.isEndOfWord) {
+        current = this.state.deletionTree;
+        for (let index = 0; index < word.length; index++) {
+          const character = word.charAt(index);
+          const childNode = current.children.get(character);
+          if (childNode === matchedNodeList[index]) {
+            if (
+              childNode.children.size === 0 ||
+              childNode.children.size === 1
+            ) {
+              current.children.delete(character);
+            } else {
+              current = childNode;
+            }
+          }
+        }
+      }
+    };
+
+    this.setState(
+      {
+        deletionTree: deepcopy(this.state.tree),
+      },
+      () => {
+        deleteWord(this.state.deletionInput);
+
+        this.setState({
+          deletionTree: this.state.deletionTree,
+        });
+      }
+    );
+  }
+
   render() {
     return (
       <div id="__trie__">
@@ -188,7 +252,11 @@ export default class Trie extends Component<{}, State> {
           <div className="input">
             Input:
             <input
-              placeholder="Try searching for word(s) in the sentence (eg: brown or happy tofu)"
+              placeholder={
+                this.state.searchBy === "word"
+                  ? wordPlaceholder
+                  : prefixPlaceholder
+              }
               disabled={this.state.isSearchDisabled}
               value={this.state.searchInput}
               onChange={(event) => {
@@ -224,6 +292,36 @@ export default class Trie extends Component<{}, State> {
           </div>
           <div className="playground">
             {this.renderTree(this.state.searchTree, "search")}
+          </div>
+          <div className="subtitle">Deletion</div>
+          <div className="input">
+            Input:
+            <input
+              placeholder="Try entering a word that you would like to see gone (eg: home)"
+              disabled={this.state.isSearchDisabled}
+              value={this.state.deletionInput}
+              onChange={(event) => {
+                this.setState({ deletionInput: event.target.value });
+              }}
+              onKeyPress={(event) => {
+                event.key === "Enter" &&
+                  this.state.deletionInput.trim() &&
+                  this.startDeletion();
+              }}
+            />
+          </div>
+          <button
+            disabled={this.state.isSearchDisabled}
+            onClick={() => {
+              this.state.tree.children.size &&
+                this.state.deletionInput.trim() &&
+                this.startDeletion();
+            }}
+          >
+            Start deletion
+          </button>
+          <div className="playground">
+            {this.renderTree(this.state.deletionTree, "delete")}
           </div>
         </Common>
       </div>

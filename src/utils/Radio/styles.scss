@@ -5,8 +5,9 @@
   font-weight: 300;
 
   > div {
-    padding: 5px;
     width: 50px;
+    z-index: -1;
+    padding: 5px;
     display: flex;
     margin: 0 10px;
     cursor: pointer;
