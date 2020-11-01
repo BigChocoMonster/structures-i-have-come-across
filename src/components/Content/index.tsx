@@ -6,8 +6,10 @@ type State = {
   currentRoute: string;
 };
 
-const componentMap: { [key: string]: JSX.Element } = {
-  "/trie": <Trie />,
+const componentMap: {
+  [key: string]: { component: JSX.Element; name: string };
+} = {
+  "/trie": { component: <Trie />, name: "Trie" },
 };
 
 export default class Content extends Component<{}, State> {
@@ -19,14 +21,34 @@ export default class Content extends Component<{}, State> {
   }
 
   componentDidMount() {
+    this.setDocumentTitle();
+
     window.addEventListener("popstate", () => {
-      this.setState({
-        currentRoute: window.location.pathname,
-      });
+      this.setState(
+        {
+          currentRoute: window.location.pathname,
+        },
+        () => {
+          this.setDocumentTitle();
+        }
+      );
     });
   }
 
+  setDocumentTitle() {
+    document.title = (
+      componentMap[this.state.currentRoute] || { name: "Structures" }
+    ).name;
+  }
+
   render() {
-    return <div id="__content__">{componentMap[this.state.currentRoute]}</div>;
+    return (
+      <div id="__content__">
+        {
+          (componentMap[this.state.currentRoute] || { component: null })
+            .component
+        }
+      </div>
+    );
   }
 }
