@@ -1,3 +1,4 @@
 export const data_structures = [
-  'Trie'
+  'Trie',
+  'Hash Table'
 ]

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import HashTable from "../Structures/HashTable";
 import Trie from "../Structures/Trie";
 import "./styles.scss";
 
@@ -10,6 +11,7 @@ const componentMap: {
   [key: string]: { component: JSX.Element; name: string };
 } = {
   "/trie": { component: <Trie />, name: "Trie" },
+  "/hash_table": { component: <HashTable />, name: "Hash Table" },
 };
 
 export default class Content extends Component<{}, State> {

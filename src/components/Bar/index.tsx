@@ -4,7 +4,11 @@ import "./styles.scss";
 
 export default class Bar extends Component<{}, {}> {
   setRoute(route: string) {
-    window.history.pushState(null, route, `/${route.toLowerCase()}`);
+    window.history.pushState(
+      null,
+      route,
+      `/${route.toLowerCase().replaceAll(" ", "_")}`
+    );
     window.dispatchEvent(new Event("popstate"));
   }
 
